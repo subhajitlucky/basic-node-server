@@ -1,53 +1,38 @@
-//import the http module to create a server
-const http = require('http');
+//import express
+const express = require('express');
 
-//import fs module to read files
-const fs = require('fs');
+//module for working with file and directory paths
+const path = require('path');
 
-//create a server that handles requests and responses
-const server = http.createServer(
-    (req,res) => {
-        //set the response header
-        res.setHeader('Content-Type','text/html');
+//initializing express
+const app = express();
 
+//serve the static files from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
 
-        if(req.url === '/') {
-            fs.readFile('./public/index.html', 
-                (err, data) => {
-                    if(err){
-                        res.statusCode = 500; //Internal Server Error
-                        res.end('<h1>Internal Server Error</h1>');
-                    }else{
-                        res.statusCode = 200; //OK
-                        res.end(data);
-                    }
-                }
-            );
-        }
+//define routes
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
-        // //route handling based on the url
-        //  if(req.url === '/'){
-        //     res.statusCode = 200; //OK
-        //     res.end('<h1>Welcome to my server!</h1>');
-        //  }else if(req.url === '/about') {
-        //     res.statusCode = 200; //OK
-        //     res.end('<h1>About Me</h1><p>This is a simple nodejs server!</p>');
-        //  } else if(req.url === '/contact'){
-        //     res.statusCode = 200; //OK
-        //     res.end('<h1>Contact</h1>');
-        //  }
-        //  else{
-        //     res.statusCode = 404; //Not Found
-        //     res.end('<h1>Page Not Found</h1>');
-        //  }
-    }
-);
+app.get('/about', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'about.html'));
+});
 
-//define the port to listen
-const port = 3000;
+app.get('/contact', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'contact.html'));
+});
 
-server.listen(port, 
-    () => {
-        console.log(`Server is running on port http://localhost:${port}`);
-    }
-)
+//handle 404
+app.use((req, res) => {
+    res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
+});
+
+//listen on port 3000
+
+const PORT = 3000;
+
+// Start the server
+app.listen(PORT, () => {
+    console.log(`Server is running at http://localhost:${PORT}`);
+});
